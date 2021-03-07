@@ -8,7 +8,7 @@ from api_keys import BEARER_TOKEN
 
 
 def create_url():
-    query = "from:twitterdev -is:retweet"
+    query = "ironman -movie -superhero"#"from:twitterdev -is:retweet"
     # Tweet fields are adjustable.
     # Options include:
     # attachments, author_id, context_annotations,
