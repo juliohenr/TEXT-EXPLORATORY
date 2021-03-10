@@ -4,7 +4,7 @@
 
     body {
 
-        background: linear-gradient(to right,rgb(23, 66, 6),rgb(3, 32, 4));
+        background: linear-gradient(to right,rgb(0, 139, 139),rgb(0, 0, 0));
     
         height: 2000px;
     
@@ -80,22 +80,34 @@
     }
 
 
-    #card-5 {
 
-
-        height: 100%;
-        width: 100%;
-
-
-
-    }
 
     #text-summary {
 
         color: white;
-        font-size: 50px;
+        font-size: 70px;
 
     }
+
+
+    #text-cloud-words {
+
+        color: white;
+        font-size: 5px;
+
+
+    }
+
+
+
+    #card-2 {
+
+        background-image: url("word_cloud.png");
+        background-size: cover;
+
+    
+    }
+
 
 }
 
@@ -113,7 +125,8 @@
 
 body {
 
-    background: linear-gradient(to right,rgb(23, 66, 6),rgb(3, 32, 4));
+    background: radial-gradient(rgb(0, 97, 97), rgb(0, 0, 0)); 
+    
 
     height: 2000px;
 
@@ -187,6 +200,15 @@ h2 {
     padding: 5px;
     margin:5px;
     
+}
+
+
+#card-2 {
+
+    background-image: url("word_cloud.png");
+    background-size: cover;
+    align-items: center;
+
 }
 
 }
