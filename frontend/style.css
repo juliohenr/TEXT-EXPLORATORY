@@ -4,7 +4,7 @@
 
     body {
 
-        background: linear-gradient(to right,rgb(0, 139, 139),rgb(0, 0, 0));
+        background: radial-gradient(rgb(0, 97, 97), rgb(0, 0, 0)); 
     
         height: 2000px;
     
