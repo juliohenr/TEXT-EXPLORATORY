@@ -1,0 +1,171 @@
+{% load static %}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+
+    <link rel="stylesheet" href= "{% static 'css/style.css' %}">
+
+
+</head>
+<body>
+    
+    <section>
+
+    <h1>TEXT EXPLORATORY</h1>
+
+
+    <div class="container-cards">
+
+
+
+
+        <article class="card card-1">
+
+            <div class="freq-words">
+
+                <h1 class="text-summary">STATISTIC REPORT</h1>
+
+                <ul>
+                    <li>AVG Quantity of tokens = 300</li>
+                    <li>VAR Quantity of tokens = 40</li>
+                    <li> MEDIAN Quantity of tokens = 310</li>
+                    <li>STD Quantity of tokens = 25</li>
+                    <li>AVG Quantity of differents tokens = 300</li>
+                    <li>VAR Quantity of differents tokens = 40</li>
+                    <li> MEDIAN Quantity of differents tokens = 310</li>
+                    <li>STD Quantity of differents differents tokens = 25</li>
+
+                </ul>
+                
+            </div>
+
+        </article>
+
+
+
+
+        <article class="card-2">
+
+
+            
+
+            
+
+                <img src="word_cloud.png" >
+
+
+        </article>
+
+
+
+    </div>
+
+
+<div class="container-cards">
+
+
+    <article class="card card-3">
+
+        <div class="freq-words">
+        <canvas id="grafico3"></canvas>
+        
+        </div>
+
+
+    </article>
+
+
+    <article class="card card-4">
+
+        <div class="freq-words">
+        
+        <canvas id="grafico4"></canvas>
+            
+        </div>
+
+    </article>
+
+
+</div>
+    
+
+
+    <div class="container-cards">
+
+        <article class="card card-5">
+
+            <div class="freq-words">
+
+                <canvas id="grafico5"></canvas>
+                
+            </div>
+
+        </article>
+
+        <article class="card card-6">
+
+            <div class="freq-words">
+
+                <canvas id="grafico6"></canvas>
+                
+            </div>
+
+        </article>
+
+
+    
+
+    </div>
+
+
+
+    <div class="container-cards">
+
+        <article class="card card-7">
+
+            <div class="freq-words">
+
+                <canvas id="grafico7"></canvas>
+                
+            </div>
+
+        </article>
+
+        
+
+
+        <article class="card card-8">
+
+            <div class="freq-words">
+
+                <canvas id="grafico8"></canvas>
+                
+            </div>
+
+        </article>
+
+
+    
+
+    </div>
+
+
+
+
+    </section>
+
+
+
+    
+    <script src="{% static 'js/node_modules/chart.js/dist/Chart.min.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    
+</body>
+</html>
