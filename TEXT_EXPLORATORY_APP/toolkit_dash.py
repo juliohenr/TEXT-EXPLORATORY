@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from django.http import HttpResponse
 import requests
 import json
 import os
@@ -7,39 +5,6 @@ import pandas as pd
 from datetime import datetime
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-
-
-LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
-
-
-
-print("\n")
-print("\n")
-print("\n")
-
-print(LOCAL_PATH)
-
-print("\n")
-print("\n")
-print("\n")
-
-DATA_PATH = os.path.join(LOCAL_PATH,'dataset_tweets_test.csv')
-
-print("\n")
-print("\n")
-print("\n")
-
-print(DATA_PATH)
-
-print("\n")
-print("\n")
-print("\n")
-
-
-
-data_tweets_final = pd.read_csv(DATA_PATH)
-
-
 
 # Funções (Análise Exploratória)
 
@@ -189,73 +154,3 @@ def text_cleaner(text):
     text = text['text'].values[0]
 
     return text
-
-
-#EXTRACT DATA TO PLOT DASHBOARD
-
-# Criação de uma coluna com os textos sem repetição de palavras para ser utilizado na análise exploratória
-
-data_tweets_final['text_unique_words'] = data_tweets_final['text'].apply(lambda x: convert_text_to_no_repeat_words(x))
-
-# Calculo Número de tokens
-
-data_tweets_final['number_tokens'] = data_tweets_final['text'].apply(lambda x: calculate_number_words(x))
-
-# Calculo Número de diferentes tokens
-
-data_tweets_final['number_diferent_tokens'] = data_tweets_final['text'].apply(lambda x: calculate_number_diferent_words(x))
-
-
-# DF top 10 MEAN
-
-df_report_mean = plot_bar_count_words(text_column='text',
-                                                dataframe=data_tweets_final,
-                                                metric='MEAN',top=10,return_df=True)
-
-# DF top 10 SUM
-
-df_report_sum = plot_bar_count_words(text_column='text',
-                                                dataframe=data_tweets_final,
-                                                metric='SUM',top=10,return_df=True)
-
-# DF top 10 MEAN TF-IDF
-
-df_report_tfidf_mean = plot_bar_tf_idf(text_column='text',
-                                                dataframe=data_tweets_final,
-                                                metric='MEAN',top=10,return_df=True)
-
-# DF top 10 MAX TF-IDF
-
-df_report_tfidf_max = plot_bar_tf_idf(text_column='text',
-                                                dataframe=data_tweets_final,
-                                                metric='MAX',top=10,return_df=True)
-
-
-
-data = {
-    "mean_count_results":df_report_mean["MEAN"].tolist(),
-    "mean_count_words": json.dumps(df_report_mean["WORDS"].tolist()),
-
-    "sum_count_results":df_report_sum["SUM"].tolist(),
-    "sum_count_words":df_report_sum["WORDS"].tolist(),
-
-    "tfidf_mean_results":df_report_tfidf_mean["MEAN"].tolist(),
-    "tfidf_mean_words":df_report_tfidf_mean["WORDS"].tolist(),
-
-    "tfidf_max_results":df_report_tfidf_max["MAX"].tolist(),
-    "tfidf_max_words":df_report_tfidf_max["WORDS"].tolist()
-}
-
-
-
-print(data)
-
-#ROUTES
-
-
-def index (request):
-
-    #return HttpResponse("<h1>Oi<h1>")
-
-    return render(request,"index.html",data)
-

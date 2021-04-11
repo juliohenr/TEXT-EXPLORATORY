@@ -17,7 +17,7 @@ var grafico3 = new Chart(contexto3,
         type:"bar",
         data: {
 
-            labels:["palavra 1","palavra 2","palavra 3","palavra 4","palavra 5","palavra 6","palavra 7","palavra 8","palavra 9","palavra 10"],
+            labels:{{ mean_count_words }},
             datasets: [{
                 //label:"# de votos",
                 data:[700,522,510,401,369,350,300,293,256,124],
