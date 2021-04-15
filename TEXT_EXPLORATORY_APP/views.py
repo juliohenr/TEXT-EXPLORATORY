@@ -13,28 +13,6 @@ LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 
-print("\n")
-print("\n")
-print("\n")
-
-print(LOCAL_PATH)
-
-print("\n")
-print("\n")
-print("\n")
-
-DATA_PATH = os.path.join(LOCAL_PATH,'dataset_tweets_test.csv')
-
-print("\n")
-print("\n")
-print("\n")
-
-print(DATA_PATH)
-
-print("\n")
-print("\n")
-print("\n")
-
 
 
 data_tweets_final = pd.read_csv(DATA_PATH)
@@ -229,6 +207,17 @@ df_report_tfidf_mean = plot_bar_tf_idf(text_column='text',
 df_report_tfidf_max = plot_bar_tf_idf(text_column='text',
                                                 dataframe=data_tweets_final,
                                                 metric='MAX',top=10,return_df=True)
+
+
+# DF top 10 SUM docs
+
+
+df_report_sum_docs = plot_bar_count_words(text_column='text_unique_words',
+                                                dataframe=data_tweets_final,
+                                                metric='SUM',top=10,return_df=True)
+
+
+df_report_sum["P_DOCS"] =  df_report_sum["SUM"]/len(data_tweets_final)
 
 
 
