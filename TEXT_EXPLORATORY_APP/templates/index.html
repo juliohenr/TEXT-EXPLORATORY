@@ -32,15 +32,20 @@
 
                 <h1 class="text-summary">STATISTIC REPORT</h1>
 
+
+
+    "std_count":std_count,
+    "std_count_diferents_tokens":std_count_diferents_tokens,
+
                 <ul>
-                    <li>AVG Quantity of tokens = 300</li>
-                    <li>VAR Quantity of tokens = 40</li>
-                    <li> MEDIAN Quantity of tokens = 310</li>
-                    <li>STD Quantity of tokens = 25</li>
-                    <li>AVG Quantity of differents tokens = 300</li>
-                    <li>VAR Quantity of differents tokens = 40</li>
-                    <li> MEDIAN Quantity of differents tokens = 310</li>
-                    <li>STD Quantity of differents differents tokens = 25</li>
+                    <li>AVG Quantity of tokens = {{mean_count}}</li>
+                    <li>VAR Quantity of tokens = {{var_count}}</li>
+                    <li> MEDIAN Quantity of tokens = {{median_count}}</li>
+                    <li>STD Quantity of tokens = {{std_count}}</li>
+                    <li>AVG Quantity of differents tokens = {{mean_count_diferents_tokens}}</li>
+                    <li>VAR Quantity of differents tokens = {{var_count_diferents_tokens}}</li>
+                    <li> MEDIAN Quantity of differents tokens = {{median_count_diferents_tokens}}</li>
+                    <li>STD Quantity of differents differents tokens = {{std_count_diferents_tokens}}</li>
 
                 </ul>
                 
@@ -54,11 +59,7 @@
         <article class="card-2" >
 
 
-            
-
-            
-
-                <img src="{% static '/css/word_cloud.png' %}" >
+                <img src="{% static '/css/word_cloud.png' %}"  width="1050" height="500">
 
 
         </article>
@@ -406,10 +407,10 @@
                 type:"bar",
                 data: {
 
-                    labels:["palavra 1","palavra 2","palavra 3","palavra 4","palavra 5","palavra 6","palavra 7","palavra 8","palavra 9","palavra 10"],
+                    labels:{{ words_number_of_docs | safe }},
                     datasets: [{
                         //label:"# de votos",
-                        data:[743,420,415,411,331,325,285,283,236,124],
+                        data:{{ number_of_docs | safe }},
                         backgroundColor : "#45b6fe",
 
                         borderColor:  [
@@ -508,10 +509,10 @@
                     type:"bar",
                     data: {
             
-                        labels:["palavra 1","palavra 2","palavra 3","palavra 4","palavra 5","palavra 6","palavra 7","palavra 8","palavra 9","palavra 10"],
+                        labels:{{ words_number_of_docs | safe}},
                         datasets: [{
                             //label:"# de votos",
-                            data:[743,420,415,411,331,325,285,283,236,124],
+                            data:{{ p_number_of_docs | safe}},
                             backgroundColor : "#45b6fe",
             
                             borderColor:  [
@@ -616,10 +617,10 @@
                 type:"bar",
                 data: {
 
-                    labels:[10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200],
+                    labels:{{ histogram_bins_number_tokens |safe }},
                     datasets: [{
                         //label:"# de votos",
-                        data:[9,9,2,8,7,13,19,21,40,47,42,19,20,19,17,15,13,10,10,7],
+                        data:{{ histogram_number_tokens |safe }},
                         backgroundColor : "#45b6fe",
 
                         borderColor:  [
@@ -738,10 +739,10 @@
                     type:"bar",
                     data: {
             
-                        labels:[10,20,30,40,50,60,70,80,90,100,210,320,230,190,150,160,170,180,190,200],
+                        labels:{{ histogram_bins_diferent_tokens |safe }},
                         datasets: [{
                             //label:"# de votos",
-                            data:[9,9,2,8,7,13,19,21,40,47,42,19,20,19,17,15,13,10,10,7],
+                            data:{{ histogram_number_diferent_tokens |safe }},
                             backgroundColor : "#45b6fe",
             
                             borderColor:  [

@@ -105,7 +105,9 @@
     #card-2 {
 
         /*background-image: url("{% static 'word_cloud.png' %}");*/ 
-        background-size: cover; 
+        /*background-size: cover;*/ 
+        width: 90%;
+        height: 30%;
 
     
     }
@@ -207,9 +209,11 @@ h2 {
 
 #card-2 {
 
-    /*background-image: url("{% static 'word_cloud.png' %}");*/ 
-    background-size: cover;
-    align-items: center;
+
+        /*background-image: url("{% static 'word_cloud.png' %}");*/ 
+        /*background-size: cover;*/ 
+        width: 10px;
+        height: 10px;
 
 }
 
