@@ -12,6 +12,9 @@ from os import path
 from PIL import Image
 import re
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+import nltk
+from nltk.corpus import stopwords
+nltk.download('stopwords')
 
 
 
@@ -157,26 +160,22 @@ def convert_text_to_no_repeat_words(text):
 ### Função para o pré-processamento do texto 
 
 
-def text_cleaner(text):
+
+def text_cleaner(text,stop_words_domain =None):
+    try:
+        nltk_stopwords = stopwords.words('portuguese') + stop_words_domain
+    except:
+        nltk_stopwords = stopwords.words('portuguese')
+
+    regex_stop_words = '|'.join(nltk_stopwords)
+    text = re.sub(r"\shttps([a-zA-Zà-úÀ-Ú0-9]|[-()\"#/@;:<>{}`+=~|.!?,])+$|^https([a-zA-Zà-úÀ-Ú0-9]|[-()\"#/@;:<>{}`+=~|.!?,])+\s|\shttps([a-zA-Zà-úÀ-Ú0-9]|[-()\"#/@;:<>{}`+=~|.!?,])+\s"," ",text)
+    text = re.sub(r"[^a-zA-ZÀ-Úà-ú]+"," ",text)
+    text = re.sub(r"\s({})\s|\s({})$|^({})\s".format(regex_stop_words,regex_stop_words,regex_stop_words)," ",text)
     
-    nltk_stopwords = stopwords.words('portuguese')
-
-    collection_text = [ {"text" : text}]
-    text = pd.DataFrame(collection_text)
-
-    text['text'] = text['text'].astype('str')
-    text['text'] = text['text'].str.lower()
-    text['text'] = text['text'].str.replace('\n',' ')
-    text['text'] = text['text'].str.replace('\r',' ')
-    text['text'] = text['text'].apply(lambda x: norm('NFKD', x).encode('ascii', 'ignore').decode())
-    text['text'] = text['text'].apply(lambda x: re.sub(r'[^a-zA-Z0-9]',' ',x))
-    text['text'] = text['text'].apply(lambda x: re.sub(r'\s+',' ',x))
-    pat = r'\b(?:{})\b'.format('|'.join(nltk_stopwords))
-    text['text'] = text['text'].str.replace(pat,'')
-    text = text['text'].values[0]
-
     return text
 
+
+data_tweets_final["text"] = data_tweets_final["text"].apply(lambda x: text_cleaner(text=x,stop_words_domain=["globoplay"])) 
 
 # Função para estruturação do dataset que será utilizado no histograma 
 
