@@ -14,6 +14,7 @@ import re
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import nltk
 from nltk.corpus import stopwords
+from unicodedata import normalize as norm
 nltk.download('stopwords')
 
 
@@ -163,19 +164,65 @@ def convert_text_to_no_repeat_words(text):
 
 def text_cleaner(text,stop_words_domain =None):
     try:
-        nltk_stopwords = stopwords.words('portuguese') + stop_words_domain
+        nltk_stopwords =  stopwords.words('portuguese') + stop_words_domain
+
+        nltk_stopwords_processed = [norm('NFKD', i).encode('ascii', 'ignore').decode().lower() for i in nltk_stopwords]
+
     except:
         nltk_stopwords = stopwords.words('portuguese')
 
     regex_stop_words = '|'.join(nltk_stopwords)
     text = re.sub(r"\shttps([a-zA-Zà-úÀ-Ú0-9]|[-()\"#/@;:<>{}`+=~|.!?,])+$|^https([a-zA-Zà-úÀ-Ú0-9]|[-()\"#/@;:<>{}`+=~|.!?,])+\s|\shttps([a-zA-Zà-úÀ-Ú0-9]|[-()\"#/@;:<>{}`+=~|.!?,])+\s"," ",text)
-    text = re.sub(r"[^a-zA-ZÀ-Úà-ú]+"," ",text)
-    text = re.sub(r"\s({})\s|\s({})$|^({})\s".format(regex_stop_words,regex_stop_words,regex_stop_words)," ",text)
     
+    text = re.sub(r"\s+"," ",text)
+
+    
+    
+    
+
+    if re.search(r"https",text):
+
+        print("\n")
+        print(text)
+        print("\n")
+
+    text = re.sub(r"[^a-zA-ZÀ-Úà-ú]+"," ",text)
+    
+    
+    text_split = text.split(" ")
+    
+    text_list = [i for i in text_split  if norm('NFKD', i).encode('ascii', 'ignore').decode().lower() not in nltk_stopwords_processed]
+
+    text = " ".join(text_list)
+
+
     return text
 
 
-data_tweets_final["text"] = data_tweets_final["text"].apply(lambda x: text_cleaner(text=x,stop_words_domain=["globoplay"])) 
+stop_words_domain=["globoplay",
+                    "Globoplay","Globo","não","da",
+                    "só","pra","vc","pois","lá","outro",
+                    "outra","vou","vão","assim","outro",
+                    "outra","ter","ver","agora","hoje",
+                    "tudo","todos","todo","ah","acho",
+                    "achamos","né","ser","vai",
+                    "mas","porém","entretanto",
+                    "faz","fazemos","farão",
+                    "tbm","fazia","tá",
+                    "tô","aí","n",
+                    "pro","é","dessa","vamos","q",
+                    "desse","tava","msm","vamo","que","porque",
+                    "nem","mano","manos","caras","xd","kkkk","pq","por","cara",
+                    "gente","dar","sobre","tão","toda","vezes",
+                    "então","viu","vemos","pode","podemos","vez",
+                    "vcs","hein","quer","sim","deu","já","demos",
+                    "todas","aqui","sei","sabemos","fazer","fiz",
+                    "fez","fazemos","vem","vamos","ainda","tanto"]
+
+data_tweets_final["text"] = data_tweets_final["text"].apply(lambda x: text_cleaner(text=x,stop_words_domain=stop_words_domain)) 
+
+
+
 
 # Função para estruturação do dataset que será utilizado no histograma 
 
@@ -439,7 +486,7 @@ data = {
 
 text = " ".join(review for review in data_tweets_final.text)
 
-wordcloud = WordCloud(max_font_size=200, max_words=200, background_color="black",width=3000, height=1300).generate(text)
+wordcloud = WordCloud(max_font_size=300, max_words=50, background_color="black",width=3000, height=1300).generate(text)
 
 wordcloud.to_file(IMAGE_PATH)
 
