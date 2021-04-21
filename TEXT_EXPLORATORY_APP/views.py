@@ -163,6 +163,7 @@ def convert_text_to_no_repeat_words(text):
 
 
 def text_cleaner(text,stop_words_domain =None):
+
     try:
         nltk_stopwords =  stopwords.words('portuguese') + stop_words_domain
 
@@ -172,31 +173,35 @@ def text_cleaner(text,stop_words_domain =None):
         nltk_stopwords = stopwords.words('portuguese')
 
     regex_stop_words = '|'.join(nltk_stopwords)
-    text = re.sub(r"\shttps([a-zA-Zà-úÀ-Ú0-9]|[-()\"#/@;:<>{}`+=~|.!?,])+$|^https([a-zA-Zà-úÀ-Ú0-9]|[-()\"#/@;:<>{}`+=~|.!?,])+\s|\shttps([a-zA-Zà-úÀ-Ú0-9]|[-()\"#/@;:<>{}`+=~|.!?,])+\s"," ",text)
-    
-    text = re.sub(r"\s+"," ",text)
 
     
-    
+    regex_remove_https = 'https([a-zA-Zà-úÀ-Ú0-9]|[-()\#/@;:<>{}`+=~|.!?,])+'
+
+
+    text_without_https = re.sub(r"(\s|^){0}(\s{0})*($|\s)".format(regex_remove_https)," ",text)
+
+
+    text_without_special_caracteres = re.sub(r"[^a-zA-ZÀ-Úà-ú]+"," ",text_without_https)
+
+    text_without_alone_caractere = re.sub(r"\s[a-zA-ZÀ-Úà-ú0-9]\s|\s[a-zA-ZÀ-Úà-ú0-9]$|^[a-zA-ZÀ-Úà-ú0-9]\s"," ",text_without_special_caracteres)
     
 
-    if re.search(r"https",text):
+    text_pattern_space = re.sub(r"\s+"," ",text_without_alone_caractere)
 
-        print("\n")
-        print(text)
-        print("\n")
+    
+    text_split = text_pattern_space.split(" ")
 
-    text = re.sub(r"[^a-zA-ZÀ-Úà-ú]+"," ",text)
-    
-    
-    text_split = text.split(" ")
     
     text_list = [i for i in text_split  if norm('NFKD', i).encode('ascii', 'ignore').decode().lower() not in nltk_stopwords_processed]
 
-    text = " ".join(text_list)
+
+    text_final = " ".join(text_list)
 
 
-    return text
+    
+
+
+    return text_final
 
 
 stop_words_domain=["globoplay",
@@ -217,7 +222,7 @@ stop_words_domain=["globoplay",
                     "então","viu","vemos","pode","podemos","vez",
                     "vcs","hein","quer","sim","deu","já","demos",
                     "todas","aqui","sei","sabemos","fazer","fiz",
-                    "fez","fazemos","vem","vamos","ainda","tanto"]
+                    "fez","fazemos","vem","vamos","ainda","tanto","nesse"]
 
 data_tweets_final["text"] = data_tweets_final["text"].apply(lambda x: text_cleaner(text=x,stop_words_domain=stop_words_domain)) 
 
@@ -486,7 +491,7 @@ data = {
 
 text = " ".join(review for review in data_tweets_final.text)
 
-wordcloud = WordCloud(max_font_size=300, max_words=50, background_color="black",width=3000, height=1300).generate(text)
+wordcloud = WordCloud(max_font_size=300, max_words=70, background_color="black",width=3000, height=1300).generate(text)
 
 wordcloud.to_file(IMAGE_PATH)
 
