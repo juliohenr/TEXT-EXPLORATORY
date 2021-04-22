@@ -1,3 +1,6 @@
 data_extract_twitter/api_keys.py
 data_extract_twitter/__pycache__/*
 venv/*
+TEXT_EXPLORATORY_APP/api_keys.py
+TEXT_EXPLORATORY_APP/modules/api_keys.py
+TEXT_EXPLORATORY_APP/data_tweets/*

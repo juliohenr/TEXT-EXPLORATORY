@@ -1,10 +1,17 @@
-import requests
-import json
-import os
 import pandas as pd
 from datetime import datetime
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
+import numpy as np
+from os import path
+from PIL import Image
+import re
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+import nltk
+from nltk.corpus import stopwords
+from unicodedata import normalize as norm
+nltk.download('stopwords')
+
 
 # Funções (Análise Exploratória)
 
@@ -132,25 +139,94 @@ def convert_text_to_no_repeat_words(text):
 
     return text_with_no_repeat_words
 
+
+
+
+
+# Função para estruturação do dataset que será utilizado no histograma 
+
+def function_to_calc_histogram(x,initial_interval, final_interval,n_bins,indice=False):
+
+    interval = np.linspace(initial_interval, final_interval, num=n_bins)
+
+    for j,i in enumerate(interval):
+
+
+        if i == interval[len(interval)-1]:
+
+            if x>=i:
+
+                
+                if indice:
+
+                    return j
+                
+                else:
+                    
+                    return "{}<".format(x)
+
+
+        else:
+
+            if x>=i and x<interval[j+1]:
+
+                inicial = round(i, 1)
+
+                final = round(interval[j+1],1)
+
+            
+                if indice:
+
+                    return j
+                
+                else:
+                    
+                    return "[{},{})".format(inicial,final)
+
+
+
 ### Função para o pré-processamento do texto 
 
 
-def text_cleaner(text):
+def text_cleaner(text,stop_words_domain =None):
+
     
-    nltk_stopwords = stopwords.words('portuguese')
 
-    collection_text = [ {"text" : text}]
-    text = pd.DataFrame(collection_text)
+    try:
+        nltk_stopwords =  stopwords.words('portuguese') + stop_words_domain
 
-    text['text'] = text['text'].astype('str')
-    text['text'] = text['text'].str.lower()
-    text['text'] = text['text'].str.replace('\n',' ')
-    text['text'] = text['text'].str.replace('\r',' ')
-    text['text'] = text['text'].apply(lambda x: norm('NFKD', x).encode('ascii', 'ignore').decode())
-    text['text'] = text['text'].apply(lambda x: re.sub(r'[^a-zA-Z0-9]',' ',x))
-    text['text'] = text['text'].apply(lambda x: re.sub(r'\s+',' ',x))
-    pat = r'\b(?:{})\b'.format('|'.join(nltk_stopwords))
-    text['text'] = text['text'].str.replace(pat,'')
-    text = text['text'].values[0]
+        nltk_stopwords_processed = [norm('NFKD', i).encode('ascii', 'ignore').decode().lower() for i in nltk_stopwords]
 
-    return text
+    except:
+        nltk_stopwords = stopwords.words('portuguese')
+
+    regex_stop_words = '|'.join(nltk_stopwords)
+
+    
+    regex_remove_https = 'https([a-zA-Zà-úÀ-Ú0-9]|[-()\#/@;:<>{}`+=~|.!?,])+'
+
+
+    text_without_https = re.sub(r"(\s|^){0}(\s{0})*($|\s)".format(regex_remove_https)," ",text)
+
+
+    text_without_special_caracteres = re.sub(r"[^a-zA-ZÀ-Úà-ú]+"," ",text_without_https)
+
+    text_without_alone_caractere = re.sub(r"\s[a-zA-ZÀ-Úà-ú0-9]\s|\s[a-zA-ZÀ-Úà-ú0-9]$|^[a-zA-ZÀ-Úà-ú0-9]\s"," ",text_without_special_caracteres)
+    
+
+    text_pattern_space = re.sub(r"\s+"," ",text_without_alone_caractere)
+
+    
+    text_split = text_pattern_space.split(" ")
+
+    
+    text_list = [i for i in text_split  if norm('NFKD', i).encode('ascii', 'ignore').decode().lower() not in nltk_stopwords_processed]
+
+
+    text_final = " ".join(text_list)
+
+
+    
+
+
+    return text_final
