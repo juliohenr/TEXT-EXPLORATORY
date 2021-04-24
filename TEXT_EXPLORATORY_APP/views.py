@@ -16,6 +16,7 @@ import nltk
 from nltk.corpus import stopwords
 from unicodedata import normalize as norm
 from .modules.api_keys import BEARER_TOKEN
+from django.views.decorators.csrf import csrf_exempt
 from .modules.toolkit_dash import *
 from .modules.extract_tweets import *
 
@@ -29,271 +30,254 @@ IMAGE_PATH = os.path.join(LOCAL_PATH,"static" + os.sep + "css" + os.sep + "word_
 PERSIST_DATA_TWEET_PATH = os.path.join(LOCAL_PATH,"data_tweets")
 
 
-#data_tweets_final = pd.read_csv(DATA_PATH)
-
-data_tweets_final = extract_many_tweets(qnt_cycle=5,folder=PERSIST_DATA_TWEET_PATH,query="globoplay",bearer_token = BEARER_TOKEN)
-
-stop_words_domain=["não","da","globoplay",
-                    "só","pra","vc","pois","lá","outro",
-                    "outra","vou","vão","assim","outro",
-                    "outra","ter","ver","agora","hoje",
-                    "tudo","todos","todo","ah","acho",
-                    "achamos","né","ser","vai","alguma",
-                    "mas","porém","entretanto",
-                    "faz","fazemos","farão",
-                    "tbm","fazia","tá","tb","ia",
-                    "ir","to","nela","nele","nelas",
-                    "neles","naquele","naquueles",
-                    "naquelas","naquela","coisa","mim",
-                    "tô","aí","n",
-                    "pro","é","dessa","vamos","q",
-                    "desse","tava","msm","vamo","que","porque",
-                    "nem","mano","manos","caras","xd","kkkk","pq","por","cara",
-                    "gente","dar","sobre","tão","toda","vezes",
-                    "então","viu","vemos","pode","podemos","vez",
-                    "vcs","hein","quer","sim","deu","já","demos",
-                    "todas","aqui","sei","sabemos","fazer","fiz",
-                    "fez","fazemos","vem","vamos","ainda","tanto","nesse","pocah"]
-
-data_tweets_final["text"] = data_tweets_final["text"].apply(lambda x: text_cleaner(text=x,stop_words_domain=stop_words_domain)) 
-
-
-
-#EXTRACT DATA TO PLOT DASHBOARD
-
-# Criação de uma coluna com os textos sem repetição de palavras para ser utilizado na análise exploratória
-
-data_tweets_final['text_unique_words'] = data_tweets_final['text'].apply(lambda x: convert_text_to_no_repeat_words(x))
-
-# Calculo Número de tokens
-
-data_tweets_final['number_tokens'] = data_tweets_final['text'].apply(lambda x: calculate_number_words(x))
-
-# Calculo Número de diferentes tokens
-
-data_tweets_final['number_diferent_tokens'] = data_tweets_final['text'].apply(lambda x: calculate_number_diferent_words(x))
-
-# Máximo número de tokens 
-
-max_count = data_tweets_final["number_tokens"].max()
-
-
-# Mínimo número de tokens 
-
-min_count = data_tweets_final["number_tokens"].min()
-
-
-
-# Máximo número de tokens diferentes 
-
-max_count_diferents_tokens = data_tweets_final["number_diferent_tokens"].max()
-
-
-# Mínimo número de tokens diferentes 
-
-min_count_diferents_tokens = data_tweets_final["number_diferent_tokens"].min()
-
-
-
-#__________________________
-
-
-# Média número de tokens 
-
-mean_count = data_tweets_final["number_tokens"].mean()
-
-
-# Média número de tokens diferentes 
-
-mean_count_diferents_tokens = data_tweets_final["number_diferent_tokens"].mean()
-
-
-#__________________________
-
-
-# STD número de tokens 
-
-std_count = data_tweets_final["number_tokens"].std()
-
-
-# STD número de tokens diferentes 
-
-std_count_diferents_tokens = data_tweets_final["number_diferent_tokens"].std()
-
-
-
-#____________________________
-
-
-# Mediana número de tokens 
-
-median_count = data_tweets_final["number_tokens"].median()
-
-
-# Mediana número de tokens diferentes 
-
-median_count_diferents_tokens = data_tweets_final["number_diferent_tokens"].median()
-
-
-#____________________________
-
-
-
-# Variância número de tokens 
-
-var_count = data_tweets_final["number_tokens"].var()
-
-
-# Variância número de tokens diferentes 
-
-var_count_diferents_tokens = data_tweets_final["number_diferent_tokens"].var()
-
-
-#____________________________
-
-
-
-
-
-#top variable
-
-top = 30
-
-
-#Numero de bins para o histograma
-
-n_bins = 40
-
-## Dados para o histograma do number_tokens
-
-
-data_tweets_final['bins'] = data_tweets_final['number_tokens'].apply(lambda x: function_to_calc_histogram(x,initial_interval = min_count, final_interval = max_count,n_bins = n_bins,indice=False))
-
-
-data_tweets_final['indices_bins'] = data_tweets_final['number_tokens'].apply(lambda x: function_to_calc_histogram(x,initial_interval = min_count, final_interval = max_count,n_bins = n_bins,indice=True))
-
-
-data_histogram_words = data_tweets_final.groupby(["bins","indices_bins"]).sum().sort_values(by=["indices_bins"])
-
-
-data_histogram_words.reset_index(drop=False,inplace=True)
-
-## Dados para o histograma do number_diferent_tokens
-
-
-data_tweets_final['bins_diferent_tokens'] = data_tweets_final['number_diferent_tokens'].apply(lambda x: function_to_calc_histogram(x,initial_interval = min_count_diferents_tokens, final_interval = max_count_diferents_tokens,n_bins = n_bins,indice=False))
-
-
-data_tweets_final['indices_bins_diferent_tokens'] = data_tweets_final['number_diferent_tokens'].apply(lambda x: function_to_calc_histogram(x,initial_interval = min_count_diferents_tokens, final_interval = max_count_diferents_tokens,n_bins = n_bins,indice=True))
-
-
-data_histogram_diferent_words = data_tweets_final.groupby(["bins_diferent_tokens","indices_bins_diferent_tokens"]).sum().sort_values(by=["indices_bins_diferent_tokens"])
-
-
-data_histogram_diferent_words.reset_index(drop=False,inplace=True)
-
-
-
-
-
-# DF top 10 MEAN
-
-df_report_mean = plot_bar_count_words(text_column='text',
-                                                dataframe=data_tweets_final,
-                                                metric='MEAN',top=top,return_df=True)
-
-# DF top 10 SUM
-
-df_report_sum = plot_bar_count_words(text_column='text',
-                                                dataframe=data_tweets_final,
-                                                metric='SUM',top=top,return_df=True)
-
-# DF top 10 MEAN TF-IDF
-
-df_report_tfidf_mean = plot_bar_tf_idf(text_column='text',
-                                                dataframe=data_tweets_final,
-                                                metric='MEAN',top=top,return_df=True)
-
-# DF top 10 MAX TF-IDF
-
-df_report_tfidf_max = plot_bar_tf_idf(text_column='text',
-                                                dataframe=data_tweets_final,
-                                                metric='MAX',top=top,return_df=True)
-
-
-# DF top 10 SUM docs
-
-
-df_report_sum_docs = plot_bar_count_words(text_column='text_unique_words',
-                                                dataframe=data_tweets_final,
-                                                metric='SUM',top=top,return_df=True)
-
-
-df_report_sum_docs["P_DOCS"] =  (df_report_sum_docs["SUM"]/len(data_tweets_final))*100
-
-
-
-data = {
-    "mean_count_results":df_report_mean["MEAN"].tolist(),
-    "mean_count_words": json.dumps(df_report_mean["WORDS"].tolist()),
-
-    "sum_count_results":df_report_sum["SUM"].tolist(),
-    "sum_count_words":df_report_sum["WORDS"].tolist(),
-
-    "tfidf_mean_results":df_report_tfidf_mean["MEAN"].tolist(),
-    "tfidf_mean_words":df_report_tfidf_mean["WORDS"].tolist(),
-
-    "tfidf_max_results":df_report_tfidf_max["MAX"].tolist(),
-    "tfidf_max_words":df_report_tfidf_max["WORDS"].tolist(),
-
-    "histogram_bins_diferent_tokens":data_histogram_diferent_words["bins_diferent_tokens"].tolist(),
-    "histogram_number_diferent_tokens":data_histogram_diferent_words["number_diferent_tokens"].tolist(),
-
-    "histogram_bins_number_tokens":data_histogram_words["bins"].tolist(),
-    "histogram_number_tokens":data_histogram_words["number_tokens"].tolist(),
-
-    "number_of_docs": df_report_sum_docs["SUM"].tolist(),
-    "p_number_of_docs": df_report_sum_docs["P_DOCS"].tolist(),
-    "words_number_of_docs": df_report_sum_docs["WORDS"].tolist(),
-
-    "median_count":median_count,
-    "median_count_diferents_tokens":median_count_diferents_tokens,
-
-
-
-    "mean_count":mean_count,
-    "mean_count_diferents_tokens":mean_count_diferents_tokens,
-
-
-
-    "std_count":std_count,
-    "std_count_diferents_tokens":std_count_diferents_tokens,
-
-
-    "var_count":var_count,
-    "var_count_diferents_tokens":var_count_diferents_tokens,
-
-
-
-}
-
-
-text = " ".join(review for review in data_tweets_final.text)
-
-wordcloud = WordCloud(max_font_size=300, max_words=70, background_color="black",width=3000, height=1300).generate(text)
-
-wordcloud.to_file(IMAGE_PATH)
-
-
-
-
-
-#ROUTES
+#___________________________________________________________________________________________________________________________________________________________
+#ROTA PARA RENDERIZAR O DASHBOARD
 
 
 def index (request):
 
-    #return HttpResponse("<h1>Oi<h1>")
+    try:
+
+        data_tweets_final = pd.read_csv(PERSIST_DATA_TWEET_PATH + os.sep + "persist_tweets.csv")
+
+        stop_words_domain=["não","da","globoplay",
+                            "só","pra","vc","pois","lá","outro",
+                            "outra","vou","vão","assim","outro",
+                            "outra","ter","ver","agora","hoje",
+                            "tudo","todos","todo","ah","acho",
+                            "achamos","né","ser","vai","alguma",
+                            "mas","porém","entretanto",
+                            "faz","fazemos","farão",
+                            "tbm","fazia","tá","tb","ia",
+                            "ir","to","nela","nele","nelas",
+                            "neles","naquele","naquueles",
+                            "naquelas","naquela","coisa","mim",
+                            "tô","aí","n",
+                            "pro","é","dessa","vamos","q",
+                            "desse","tava","msm","vamo","que","porque",
+                            "nem","mano","manos","caras","xd","kkkk","pq","por","cara",
+                            "gente","dar","sobre","tão","toda","vezes",
+                            "então","viu","vemos","pode","podemos","vez",
+                            "vcs","hein","quer","sim","deu","já","demos",
+                            "todas","aqui","sei","sabemos","fazer","fiz",
+                            "fez","fazemos","vem","vamos","ainda","tanto","nesse","pocah"]
+
+        data_tweets_final["text"] = data_tweets_final["text"].apply(lambda x: text_cleaner(text=x,stop_words_domain=stop_words_domain)) 
+
+        #EXTRACT DATA TO PLOT DASHBOARD
+
+        # Criação de uma coluna com os textos sem repetição de palavras para ser utilizado na análise exploratória
+
+        data_tweets_final['text_unique_words'] = data_tweets_final['text'].apply(lambda x: convert_text_to_no_repeat_words(x))
+
+        # Calculo Número de tokens
+
+        data_tweets_final['number_tokens'] = data_tweets_final['text'].apply(lambda x: calculate_number_words(x))
+
+        # Calculo Número de diferentes tokens
+
+        data_tweets_final['number_diferent_tokens'] = data_tweets_final['text'].apply(lambda x: calculate_number_diferent_words(x))
+
+        # Máximo número de tokens 
+
+        max_count = data_tweets_final["number_tokens"].max()
+
+        # Mínimo número de tokens 
+
+        min_count = data_tweets_final["number_tokens"].min()
+
+        # Máximo número de tokens diferentes 
+
+        max_count_diferents_tokens = data_tweets_final["number_diferent_tokens"].max()
+
+        # Mínimo número de tokens diferentes 
+
+        min_count_diferents_tokens = data_tweets_final["number_diferent_tokens"].min()
+
+        #__________________________
+
+        # Média número de tokens 
+
+        mean_count = data_tweets_final["number_tokens"].mean()
+
+        # Média número de tokens diferentes 
+
+        mean_count_diferents_tokens = data_tweets_final["number_diferent_tokens"].mean()
+
+        #__________________________
+
+        # STD número de tokens 
+
+        std_count = data_tweets_final["number_tokens"].std()
+
+        # STD número de tokens diferentes 
+
+        std_count_diferents_tokens = data_tweets_final["number_diferent_tokens"].std()
+
+        #___________________________
+
+        # Mediana número de tokens 
+
+        median_count = data_tweets_final["number_tokens"].median()
+
+        # Mediana número de tokens diferentes 
+
+        median_count_diferents_tokens = data_tweets_final["number_diferent_tokens"].median()
+
+        #____________________________
+
+        # Variância número de tokens 
+
+        var_count = data_tweets_final["number_tokens"].var()
+
+        # Variância número de tokens diferentes 
+
+        var_count_diferents_tokens = data_tweets_final["number_diferent_tokens"].var()
+
+        #____________________________
+
+        #top variable
+
+        top = 30
+
+        #Numero de bins para o histograma
+
+        n_bins = 40
+
+        ## Dados para o histograma do number_tokens
+
+        data_tweets_final['bins'] = data_tweets_final['number_tokens'].apply(lambda x: function_to_calc_histogram(x,initial_interval = min_count, final_interval = max_count,n_bins = n_bins,indice=False))
+
+        data_tweets_final['indices_bins'] = data_tweets_final['number_tokens'].apply(lambda x: function_to_calc_histogram(x,initial_interval = min_count, final_interval = max_count,n_bins = n_bins,indice=True))
+
+        data_histogram_words = data_tweets_final.groupby(["bins","indices_bins"]).sum().sort_values(by=["indices_bins"])
+
+        data_histogram_words.reset_index(drop=False,inplace=True)
+
+        ## Dados para o histograma do number_diferent_tokens
+
+        data_tweets_final['bins_diferent_tokens'] = data_tweets_final['number_diferent_tokens'].apply(lambda x: function_to_calc_histogram(x,initial_interval = min_count_diferents_tokens, final_interval = max_count_diferents_tokens,n_bins = n_bins,indice=False))
+
+        data_tweets_final['indices_bins_diferent_tokens'] = data_tweets_final['number_diferent_tokens'].apply(lambda x: function_to_calc_histogram(x,initial_interval = min_count_diferents_tokens, final_interval = max_count_diferents_tokens,n_bins = n_bins,indice=True))
+
+        data_histogram_diferent_words = data_tweets_final.groupby(["bins_diferent_tokens","indices_bins_diferent_tokens"]).sum().sort_values(by=["indices_bins_diferent_tokens"])
+
+        data_histogram_diferent_words.reset_index(drop=False,inplace=True)
+
+        # DF top 10 MEAN
+
+        df_report_mean = plot_bar_count_words(text_column='text',
+                                                        dataframe=data_tweets_final,
+                                                        metric='MEAN',top=top,return_df=True)
+        # DF top 10 SUM
+
+        df_report_sum = plot_bar_count_words(text_column='text',
+                                                        dataframe=data_tweets_final,
+                                                        metric='SUM',top=top,return_df=True)
+        # DF top 10 MEAN TF-IDF
+
+        df_report_tfidf_mean = plot_bar_tf_idf(text_column='text',
+                                                        dataframe=data_tweets_final,
+                                                        metric='MEAN',top=top,return_df=True)
+        # DF top 10 MAX TF-IDF
+
+        df_report_tfidf_max = plot_bar_tf_idf(text_column='text',
+                                                        dataframe=data_tweets_final,
+                                                        metric='MAX',top=top,return_df=True)
+
+        # DF top 10 SUM docs
+
+        df_report_sum_docs = plot_bar_count_words(text_column='text_unique_words',
+                                                        dataframe=data_tweets_final,
+                                                        metric='SUM',top=top,return_df=True)
+
+        df_report_sum_docs["P_DOCS"] =  (df_report_sum_docs["SUM"]/len(data_tweets_final))*100
+
+        data = {
+            "mean_count_results":df_report_mean["MEAN"].tolist(),
+            "mean_count_words": json.dumps(df_report_mean["WORDS"].tolist()),
+            "sum_count_results":df_report_sum["SUM"].tolist(),
+            "sum_count_words":df_report_sum["WORDS"].tolist(),
+            "tfidf_mean_results":df_report_tfidf_mean["MEAN"].tolist(),
+            "tfidf_mean_words":df_report_tfidf_mean["WORDS"].tolist(),
+            "tfidf_max_results":df_report_tfidf_max["MAX"].tolist(),
+            "tfidf_max_words":df_report_tfidf_max["WORDS"].tolist(),
+            "histogram_bins_diferent_tokens":data_histogram_diferent_words["bins_diferent_tokens"].tolist(),
+            "histogram_number_diferent_tokens":data_histogram_diferent_words["number_diferent_tokens"].tolist(),
+            "histogram_bins_number_tokens":data_histogram_words["bins"].tolist(),
+            "histogram_number_tokens":data_histogram_words["number_tokens"].tolist(),
+            "number_of_docs": df_report_sum_docs["SUM"].tolist(),
+            "p_number_of_docs": df_report_sum_docs["P_DOCS"].tolist(),
+            "words_number_of_docs": df_report_sum_docs["WORDS"].tolist(),
+            "median_count":median_count,
+            "median_count_diferents_tokens":median_count_diferents_tokens,
+            "mean_count":mean_count,
+            "mean_count_diferents_tokens":mean_count_diferents_tokens,
+            "std_count":std_count,
+            "std_count_diferents_tokens":std_count_diferents_tokens,
+            "var_count":var_count,
+            "var_count_diferents_tokens":var_count_diferents_tokens,
+        }
+
+
+        text = " ".join(review for review in data_tweets_final.text)
+
+        wordcloud = WordCloud(max_font_size=300, max_words=70, background_color="black",width=3000, height=1300).generate(text)
+
+        wordcloud.to_file(IMAGE_PATH)
+
+    except:
+
+
+        data = {
+            "mean_count_results":[0,0,0,0,0,0,0,0,0,0],
+            "mean_count_words": ["palavra1","palavra2","palavra3","palavra4","palavra5","palavra6","palavra7","palavra8","palavra9","palavra10"],
+            "sum_count_results":[0,0,0,0,0,0,0,0,0,0],
+            "sum_count_words":["palavra1","palavra2","palavra3","palavra4","palavra5","palavra6","palavra7","palavra8","palavra9","palavra10"],
+            "tfidf_mean_results":[0,0,0,0,0,0,0,0,0,0],
+            "tfidf_mean_words":["palavra1","palavra2","palavra3","palavra4","palavra5","palavra6","palavra7","palavra8","palavra9","palavra10"],
+            "tfidf_max_results":[0,0,0,0,0,0,0,0,0,0],
+            "tfidf_max_words":["palavra1","palavra2","palavra3","palavra4","palavra5","palavra6","palavra7","palavra8","palavra9","palavra10"],
+            "histogram_bins_diferent_tokens":["bin1","bin2","bin3","bin4","bin5","bin6","bin7","bin8","bin9","bin10"],
+            "histogram_number_diferent_tokens":[0,0,0,0,0,0,0,0,0,0],
+            "histogram_bins_number_tokens":["bin1","bin2","bin3","bin4","bin5","bin6","bin7","bin8","bin9","bin10"],
+            "histogram_number_tokens":[0,0,0,0,0,0,0,0,0,0],
+            "number_of_docs": [0,0,0,0,0,0,0,0,0,0],
+            "p_number_of_docs": [0,0,0,0,0,0,0,0,0,0],
+            "words_number_of_docs": ["palavra1","palavra2","palavra3","palavra4","palavra5","palavra6","palavra7","palavra8","palavra9","palavra10"],
+            "median_count":0,
+            "median_count_diferents_tokens":0,
+            "mean_count":0,
+            "mean_count_diferents_tokens":0,
+            "std_count":0,
+            "std_count_diferents_tokens":0,
+            "var_count":0,
+            "var_count_diferents_tokens":0,
+        }
+
+
+
 
     return render(request,"index.html",data)
+
+
+#___________________________________________________________________________________________________________________________________________________________
+#ROTA PARA PERSISTIR OS DADOS
+@csrf_exempt 
+def persist_results (request):
+
+    data = json.loads(json.dumps(request.POST))
+    
+    print("\n")
+    print("\n")
+    print("\n")
+    print(data)
+    print("\n")
+    print("\n")
+    print("\n")
+
+
+    data_tweets_final = extract_many_tweets(qnt_cycle=1,folder=PERSIST_DATA_TWEET_PATH,query=data["contentTwitter"],bearer_token = BEARER_TOKEN)
+
+    return HttpResponse("<h1>Oi<h1>")
 

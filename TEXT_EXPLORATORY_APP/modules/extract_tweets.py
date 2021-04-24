@@ -23,13 +23,13 @@ def create_url(query = None,until_id=None):
     
     if until_id:
         
-        url = "https://api.twitter.com/2/tweets/search/recent?query={}&max_results=100&until_id={}".format(
+        url = "https://api.twitter.com/2/tweets/search/recent?query={}&max_results=10&tweet.fields=author_id,created_at&until_id={}&".format(
             query,until_id
         )
         
     else:
         
-        url = "https://api.twitter.com/2/tweets/search/recent?query={}&max_results=100".format(
+        url = "https://api.twitter.com/2/tweets/search/recent?query={}&max_results=10&tweet.fields=author_id,created_at".format(
             query
         )
             
@@ -98,8 +98,10 @@ def extract_many_tweets(qnt_cycle=10,folder="data_tweets",start_from_id=None,que
             
             date_extraction_str = str(date_extraction).replace(".","-").replace(":","-").replace(" ","-")
             
-            name_file = "{}/persist_tweets_{}_{}.csv".format(folder,date_extraction_str,date_extraction_str)
+            #name_file = "{}/persist_tweets_{}_{}.csv".format(folder,date_extraction_str,date_extraction_str)
             
+            name_file = "{}/persist_tweets.csv".format(folder)
+
             # persist base
             
             df_data_tweets.to_csv(name_file,sep=",")
@@ -145,7 +147,9 @@ def extract_many_tweets(qnt_cycle=10,folder="data_tweets",start_from_id=None,que
             date_extraction_str = str(date_extraction).replace(".","-").replace(":","-").replace(" ","-")
             
             
-            name_file = "{}/persist_tweets_{}_{}.csv".format(folder,oldest_date_str,date_extraction_str)
+            #name_file = "{}/persist_tweets_{}_{}.csv".format(folder,oldest_date_str,date_extraction_str)
+
+            name_file = "{}/persist_tweets.csv".format(folder)
             
             # persist base
             

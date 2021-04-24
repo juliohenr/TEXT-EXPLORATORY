@@ -211,7 +211,7 @@ def text_cleaner(text,stop_words_domain =None):
 
     text_without_special_caracteres = re.sub(r"[^a-zA-ZÀ-Úà-ú]+"," ",text_without_https)
 
-    text_without_alone_caractere = re.sub(r"\s[a-zA-ZÀ-Úà-ú0-9]\s|\s[a-zA-ZÀ-Úà-ú0-9]$|^[a-zA-ZÀ-Úà-ú0-9]\s"," ",text_without_special_caracteres)
+    text_without_alone_caractere = re.sub(r"\s[a-zA-ZÀ-Úà-ú]\s|\s[a-zA-ZÀ-Úà-ú]$|^[a-zA-ZÀ-Úà-ú]\s"," ",text_without_special_caracteres)
     
 
     text_pattern_space = re.sub(r"\s+"," ",text_without_alone_caractere)
