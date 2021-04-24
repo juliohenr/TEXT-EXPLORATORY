@@ -191,8 +191,8 @@ body {
     height: 30%;
     width: 40%;
 
-    margin-top: 170px !important;
-    margin-left: 5px !important;
+    margin-top: 35px !important;
+    margin-left: 30px !important;
     text-align: center;
     
     
@@ -216,13 +216,18 @@ h3 {
 
 }
 
+.status-system {
+
+    color: #800900;
+}
+
 .buttonStop {
 
     height: 30%;
     width: 40%;
 
-    margin-top: 170px !important;
-    margin-left: 5px !important;
+    margin-top: 35px !important;
+    margin-left: 30px !important;
 
     text-align: center;
 

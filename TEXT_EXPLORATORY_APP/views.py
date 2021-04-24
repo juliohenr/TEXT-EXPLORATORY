@@ -19,7 +19,7 @@ from .modules.api_keys import BEARER_TOKEN
 from django.views.decorators.csrf import csrf_exempt
 from .modules.toolkit_dash import *
 from .modules.extract_tweets import *
-
+import shutil
 
 LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -29,16 +29,30 @@ IMAGE_PATH = os.path.join(LOCAL_PATH,"static" + os.sep + "css" + os.sep + "word_
 
 PERSIST_DATA_TWEET_PATH = os.path.join(LOCAL_PATH,"data_tweets")
 
+PERSIST_DATA_TWEET_PATH_BACKUP = os.path.join(LOCAL_PATH,"data_tweets" + os.sep + "backup")
+
+PERSIST_DATA_TWEET_PATH_RUNNING = os.path.join(LOCAL_PATH,"data_tweets" + os.sep + "running")
+
 
 #___________________________________________________________________________________________________________________________________________________________
 #ROTA PARA RENDERIZAR O DASHBOARD
+
+
+
+files = os.listdir(PERSIST_DATA_TWEET_PATH_RUNNING)
+
+for f in files:
+
+    os.remove(os.path.join(PERSIST_DATA_TWEET_PATH_BACKUP,f))
+
+    shutil.move( os.path.join(PERSIST_DATA_TWEET_PATH_RUNNING,f) , PERSIST_DATA_TWEET_PATH_BACKUP)
 
 
 def index (request):
 
     try:
 
-        data_tweets_final = pd.read_csv(PERSIST_DATA_TWEET_PATH + os.sep + "persist_tweets.csv")
+        data_tweets_final = pd.read_csv(PERSIST_DATA_TWEET_PATH + os.sep +"running" + os.sep + "persist_tweets.csv")
 
         stop_words_domain=["não","da","globoplay",
                             "só","pra","vc","pois","lá","outro",
@@ -217,6 +231,7 @@ def index (request):
             "std_count_diferents_tokens":std_count_diferents_tokens,
             "var_count":var_count,
             "var_count_diferents_tokens":var_count_diferents_tokens,
+            "status_system":"Stopped"
         }
 
 
@@ -253,6 +268,7 @@ def index (request):
             "std_count_diferents_tokens":0,
             "var_count":0,
             "var_count_diferents_tokens":0,
+            "status_system":"Stopped"
         }
 
 
@@ -267,17 +283,23 @@ def index (request):
 def persist_results (request):
 
     data = json.loads(json.dumps(request.POST))
+
+    #data["contentTwitter"]
     
-    print("\n")
-    print("\n")
-    print("\n")
-    print(data)
-    print("\n")
-    print("\n")
-    print("\n")
+    data_tweets_final = extract_many_tweets(qnt_cycle=1,folder=PERSIST_DATA_TWEET_PATH,query="bbb",bearer_token = BEARER_TOKEN)
 
+    
+    # LOAD STATUS SYSTEM
+    
+    file_name = open(PERSIST_DATA_TWEET_PATH + os.sep +"running" + os.sep + "status_system.json", 'r')
+    
+    data_json_status = json.load(file_name)
 
-    data_tweets_final = extract_many_tweets(qnt_cycle=1,folder=PERSIST_DATA_TWEET_PATH,query=data["contentTwitter"],bearer_token = BEARER_TOKEN)
+    print("\n")
+    print("\n")
+    print(data_json_status["query"])
+    print("\n")
+    print("\n")    
 
-    return HttpResponse("<h1>Oi<h1>")
+    return HttpResponse("status: okay")
 

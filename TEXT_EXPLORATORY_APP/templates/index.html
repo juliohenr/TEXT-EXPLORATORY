@@ -22,6 +22,8 @@
 
     <div class="container-header">
 
+    
+
     <div class="div-text-content">
 
         <h3>Content:</h3>
@@ -38,6 +40,7 @@
     <!--<button class="buttonSend"><strong>SEND</strong></button>-->
 
     <div class="buttons">
+    <h1 class="status-system">{{status_system}}</h1>
     <input type="button" class="buttonRun" id="add" value="RUN" >
     <input type="button" class="buttonStop" id="add" value="STOP" >
 </div>     
@@ -48,16 +51,11 @@
 
     <div class="container-cards">
 
-
-
-
         <article class="card card-1">
 
             <div class="freq-words">
 
                 <h1 class="text-summary">STATISTIC REPORT</h1>
-
-
 
 
                 <ul>
@@ -77,16 +75,12 @@
         </article>
 
 
-
-
         <article class="card-2" >
-
 
                 <img src="{% static '/css/word_cloud.png' %}"  width="1050" height="500">
 
 
         </article>
-
 
 
     </div>
@@ -189,6 +183,8 @@
 
     
     <script src="{% static 'js/node_modules/chart.js/dist/Chart.min.js' %}"></script>
+
+    <script src="{% static 'js/jquery.js' %}"></script>
 
     <script src="{% static 'js/functions_buttons.js' %}"></script>
     <!--<script src="{% static 'js/app.js' %}"></script>-->
