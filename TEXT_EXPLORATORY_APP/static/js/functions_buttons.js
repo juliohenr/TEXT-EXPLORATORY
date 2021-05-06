@@ -3,12 +3,56 @@ buttonRun = document.querySelector(".buttonRun")
 
 buttonStop = document.querySelector(".buttonStop")
 
+if(document.querySelector(".status-system").innerText == "Running") {
+
+  document.querySelector(".status-system").style.color = "#008000"
+
+  } else {
+
+
+    document.querySelector(".status-system").style.color = "#800900"
+
+  }
+
 
 
 buttonStop.addEventListener("click", function() {
 
 
-  document.querySelector("p").innerText = "0"
+  document.querySelector(".status-system").innerText = "Stopped"
+
+  document.querySelector(".status-system").style.color = "#800900"
+
+  console.log("carregou!")
+  
+  //contentTwitter = document.querySelector(".contentTwitter").value;
+  
+ 
+  let data = new FormData();
+  
+  //data.append("contentTwitter", contentTwitter);
+
+  data.append("status_sytem", "Stopped");
+  
+  
+  
+  console.log("clicou aqui!")
+    
+  const Http = new XMLHttpRequest();
+  
+  const url='http://127.0.0.1:8000/persist_results';
+  
+  
+  
+  Http.open("POST", url,true);
+  
+  Http.send(data);
+  
+  Http.onreadystatechange = (e) => {
+  console.log(Http.responseText);
+  location.reload(true);
+  
+  }
 
 
 })
@@ -26,11 +70,12 @@ buttonRun.addEventListener("click", function() {
     
     console.log(contentTwitter)
     
-    dados = {data:contentTwitter,status_sytem:"Running"};
-    
+   
     let data = new FormData();
     
-    data.append("contentTwitter", contentTwitter);
+    //data.append("contentTwitter", contentTwitter);
+
+    data.append("status_sytem", "Running");
     
     
     
@@ -41,13 +86,6 @@ buttonRun.addEventListener("click", function() {
     const url='http://127.0.0.1:8000/persist_results';
     
     
-    data.append("contentTwitter", contentTwitter);
-
-    data.append("status_sytem", contentTwitter);
-    
-    
-    
-    console.log(dados)
     
     Http.open("POST", url,true);
     
@@ -87,7 +125,7 @@ interval = setInterval(function () {
     
     data.append("contentTwitter", contentTwitter);
 
-    data.append("contentTwitter", contentTwitter);
+    data.append("status_sytem", "Running");
     
     
     

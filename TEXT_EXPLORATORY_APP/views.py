@@ -54,6 +54,31 @@ def index (request):
 
         data_tweets_final = pd.read_csv(PERSIST_DATA_TWEET_PATH + os.sep +"running" + os.sep + "persist_tweets.csv")
 
+        try:
+
+            with open(PERSIST_DATA_TWEET_PATH + os.sep +"running" + os.sep + 'status_system.json') as f:
+
+                status_system_data = json.load(f)
+
+                status_system = status_system_data["status"]
+
+                print("\n")
+                print("\n")
+                print(status_system)
+                print("\n")
+                print("\n")
+        
+
+        except:
+
+                status_system = "Stopped"
+
+
+
+        #status_load = json.load(PERSIST_DATA_TWEET_PATH + os.sep +"running" + os.sep + "persist_tweets.csv")
+
+
+
         stop_words_domain=["não","da","globoplay",
                             "só","pra","vc","pois","lá","outro",
                             "outra","vou","vão","assim","outro",
@@ -231,7 +256,7 @@ def index (request):
             "std_count_diferents_tokens":std_count_diferents_tokens,
             "var_count":var_count,
             "var_count_diferents_tokens":var_count_diferents_tokens,
-            "status_system":"Stopped"
+            "status_system":status_system
         }
 
 
@@ -241,6 +266,7 @@ def index (request):
 
         wordcloud.to_file(IMAGE_PATH)
 
+    
     except:
 
 
@@ -272,8 +298,7 @@ def index (request):
         }
 
 
-
-
+    
     return render(request,"index.html",data)
 
 
@@ -283,6 +308,15 @@ def index (request):
 def persist_results (request):
 
     data = json.loads(json.dumps(request.POST))
+
+    print("\n")
+    print("\n")
+    print("\n")
+    print("data: \n")
+    print(data)
+    print("\n")
+    print("\n")
+    print("\n")
 
     #data["contentTwitter"]
     
@@ -300,6 +334,17 @@ def persist_results (request):
     print(data_json_status["query"])
     print("\n")
     print("\n")    
+    
+    
+    status_system = {'status':data["status_sytem"]}
+
+    f_status_system = open("{}/running/status_system.json".format(PERSIST_DATA_TWEET_PATH), 'w')
+    
+    
+    json.dump(status_system, f_status_system)
+
+
+
 
     return HttpResponse("status: okay")
 
