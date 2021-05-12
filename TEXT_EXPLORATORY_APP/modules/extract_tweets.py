@@ -1,4 +1,3 @@
-
 import requests
 import os
 import json
@@ -55,20 +54,41 @@ def connect_to_endpoint(url, headers):
     return response.json()
 
 
-def extract_100_tweets(query = None,until_id=None,key_twitter = None):
+def extract_100_tweets(query = None,until_id=None,since_id=None,key_twitter = None):
     bearer_token = key_twitter
-    url = create_url(query,until_id)
+    
+    if not until_id:
+        
+        url = create_url(query,until_id = until_id)
+        
+    elif not since_id:
+        
+        url = create_url(query,since_id = since_id)
+        
+    else:
+        
+        url = create_url(query = query)
+    
     headers = create_headers(bearer_token)
     json_response = connect_to_endpoint(url, headers)
     data_tweets = json.dumps(json_response, indent=4, sort_keys=True)
     return json_response
 
-def extract_many_tweets(qnt_cycle=10,folder="data_tweets",until_id=None,since_id=None,query="@BBB",bearer_token = None,df_concat_path=None):
+def extract_many_tweets(qnt_cycle=10,
+                        folder="data_tweets",
+                        until_id=None,
+                        since_id=None,
+                        query="@BBB",
+                        bearer_token = None,
+                        df_concat_path=None):
 
 
     if since_id:
 
-        data_tweets_recent = extract_100_tweets(query = "{} -is:retweet".format(query),since_id=since_id,key_twitter = bearer_token)
+        data_tweets_recent = extract_100_tweets(query = "{} -is:retweet".format(query),
+                                                since_id=since_id,
+                                               key_twitter = bearer_token)
+        '''
         time.sleep(1)
 
         oldest_id = data_tweets_recent['meta']['oldest_id']
@@ -91,8 +111,14 @@ def extract_many_tweets(qnt_cycle=10,folder="data_tweets",until_id=None,since_id
         # persist base
                 
         df_data_tweets.to_csv(name_file,sep=",")
-
-         
+        '''
+        
+        data = {
+                'data':data_tweets_recent["data"],
+                'meta': {'newest_id': data_tweets_recent["meta"]["newest_id"],
+                        'oldest_id': data_tweets_recent["meta"]["oldest_id"],'query':query}
+                }       
+        
     else:
 
         
@@ -122,30 +148,24 @@ def extract_many_tweets(qnt_cycle=10,folder="data_tweets",until_id=None,since_id
                 
                 #get the current date
                 
-                date_extraction = datetime.now()
-                
-                df_data_tweets_temp["date_extraction"] = date_extraction 
-                
                 
                 oldest_id = data_tweets['meta']['oldest_id']
 
                 newest_id = data_tweets['meta']['newest_id']
                 
-                oldest_date = date_extraction
-                
                 df_data_tweets = df_data_tweets_temp.copy()
                 
                 # name file
                 
-                date_extraction_str = str(date_extraction).replace(".","-").replace(":","-").replace(" ","-")
+                #date_extraction_str = str(date_extraction).replace(".","-").replace(":","-").replace(" ","-")
                 
                 #name_file = "{}/persist_tweets_{}_{}.csv".format(folder,date_extraction_str,date_extraction_str)
                 
-                name_file = "{}/running/persist_tweets.csv".format(folder)
+                #name_file = "{}/running/persist_tweets.csv".format(folder)
 
                 # persist base
                 
-                df_data_tweets.to_csv(name_file,sep=",")
+                #df_data_tweets.to_csv(name_file,sep=",")
                 
         
                 
@@ -163,49 +183,48 @@ def extract_many_tweets(qnt_cycle=10,folder="data_tweets",until_id=None,since_id
                 #get the current date
                 
                 
-                date_extraction = datetime.now()
-                
-                df_data_tweets_temp["date_extraction"] = date_extraction 
                 
                 oldest_id = data_tweets_temp['meta']['oldest_id']
                 
                 df_data_tweets = pd.concat([df_data_tweets,df_data_tweets_temp.copy()])
-                
-                date_extraction = datetime.now()
+
                 
                 df_data_tweets.reset_index(inplace=True,drop=True)
                 
                 
                 # remove old files
                 
-                os.remove(name_file)
+                #os.remove(name_file)
                 
                 
                 # name file
                 
-                oldest_date_str = str(oldest_date).replace(".","-").replace(":","-").replace(" ","-")
+                #oldest_date_str = str(oldest_date).replace(".","-").replace(":","-").replace(" ","-")
                 
-                date_extraction_str = str(date_extraction).replace(".","-").replace(":","-").replace(" ","-")
+                #date_extraction_str = str(date_extraction).replace(".","-").replace(":","-").replace(" ","-")
                 
                 
                 #name_file = "{}/persist_tweets_{}_{}.csv".format(folder,oldest_date_str,date_extraction_str)
 
-                name_file = "{}/running/persist_tweets.csv".format(folder)
+                #name_file = "{}/running/persist_tweets.csv".format(folder)
                 
                 # persist base
                 
-                df_data_tweets.to_csv(name_file.format(folder),sep=",")
+                #df_data_tweets.to_csv(name_file.format(folder),sep=",")
                 
     
+        data = {
+                'data':df_data_tweets.to_dict("records"),
+                'meta': {'newest_id': newest_id,
+                        'oldest_id': oldest_id,'query':query}
+                }
+
+    #status_system = {'df_concat_path':name_file,'newest_id':newest_id,'oldest_id':oldest_id,'query':query}
+
+    #f_status_system = open("{}/running/status_system.json".format(folder), 'w')
+    #json.dump(status_system, f_status_system)
 
 
-
-    status_system = {'df_concat_path':name_file,'newest_id':newest_id,'oldest_id':oldest_id,'query':query}
-
-    f_status_system = open("{}/running/status_system.json".format(folder), 'w')
-    json.dump(status_system, f_status_system)
-
-
-    return df_data_tweets
+    return data
     
     

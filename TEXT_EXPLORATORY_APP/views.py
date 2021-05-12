@@ -43,9 +43,13 @@ files = os.listdir(PERSIST_DATA_TWEET_PATH_RUNNING)
 
 for f in files:
 
-    os.remove(os.path.join(PERSIST_DATA_TWEET_PATH_BACKUP,f))
+    try:
 
-    shutil.move( os.path.join(PERSIST_DATA_TWEET_PATH_RUNNING,f) , PERSIST_DATA_TWEET_PATH_BACKUP)
+        os.remove(os.path.join(PERSIST_DATA_TWEET_PATH_BACKUP,f))
+
+    except:
+
+        shutil.move( os.path.join(PERSIST_DATA_TWEET_PATH_RUNNING,f) , PERSIST_DATA_TWEET_PATH_BACKUP)
 
 
 def index (request):
@@ -322,9 +326,35 @@ def persist_results (request):
     
     data_tweets_final = extract_many_tweets(qnt_cycle=1,folder=PERSIST_DATA_TWEET_PATH,query="bbb",bearer_token = BEARER_TOKEN)
 
+    print("\n")
+    print("\n")
+
+    print(data_tweets_final)
+
+    print("\n")
+    print("\n")
+
+    f_data = open(PERSIST_DATA_TWEET_PATH + os.sep +"running" + os.sep + "data_tweets.json", 'w+', encoding='utf8')
+
+
+
+    json.dump(data_tweets_final, f_data, ensure_ascii=False)
+
+
+
+
+    status_system = {'status':data["status_sytem"]}
+
+    f_status_system = open("{}/running/status_system.json".format(PERSIST_DATA_TWEET_PATH), 'w')
+    
+    
+    json.dump(status_system, f_status_system)
+
+
+
     
     # LOAD STATUS SYSTEM
-    
+    '''
     file_name = open(PERSIST_DATA_TWEET_PATH + os.sep +"running" + os.sep + "status_system.json", 'r')
     
     data_json_status = json.load(file_name)
@@ -334,15 +364,8 @@ def persist_results (request):
     print(data_json_status["query"])
     print("\n")
     print("\n")    
+    '''
     
-    
-    status_system = {'status':data["status_sytem"]}
-
-    f_status_system = open("{}/running/status_system.json".format(PERSIST_DATA_TWEET_PATH), 'w')
-    
-    
-    json.dump(status_system, f_status_system)
-
 
 
 
