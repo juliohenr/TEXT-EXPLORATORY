@@ -20,6 +20,9 @@ from django.views.decorators.csrf import csrf_exempt
 from .modules.toolkit_dash import *
 from .modules.extract_tweets import *
 import shutil
+import datetime
+from datetime import timedelta
+
 
 LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -54,13 +57,44 @@ for f in files:
 
 def index (request):
 
-    try:
+    
 
-        data_tweets_final = pd.read_csv(PERSIST_DATA_TWEET_PATH + os.sep +"running" + os.sep + "persist_tweets.csv")
+    if os.path.isfile(PERSIST_DATA_TWEET_PATH_RUNNING + os.sep + "data_tweets.json"):
 
-        try:
 
-            with open(PERSIST_DATA_TWEET_PATH + os.sep +"running" + os.sep + 'status_system.json') as f:
+        # LOAD data_tweets
+
+        
+        file_name_data_tweets = open(PERSIST_DATA_TWEET_PATH_RUNNING + os.sep + "data_tweets.json", 'r')
+        
+        data_json_tweets = json.load(file_name_data_tweets)
+
+        print("\n")
+        print("\n")
+        print("DATA TWEETS: \n")
+        print(data_json_tweets)
+        print("\n")
+        print("\n")    
+        
+        
+        query = data_json_tweets["meta"]["query"]
+
+
+        data_tweets_final = pd.DataFrame.from_dict(data_json_tweets["data"])
+
+        data_tweets_final.drop_duplicates(inplace=True)
+
+
+        data_tweets_final["created_at"] = data_tweets_final["created_at"].apply(lambda x: modify_date(x))
+
+        oldest_date_tweet =  str(data_tweets_final["created_at"].min())
+
+        newest_date_tweet =  str(data_tweets_final["created_at"].max())
+
+
+        if os.path.isfile(PERSIST_DATA_TWEET_PATH_RUNNING + os.sep + 'status_system.json'):
+
+            with open(PERSIST_DATA_TWEET_PATH_RUNNING + os.sep + 'status_system.json') as f:
 
                 status_system_data = json.load(f)
 
@@ -73,7 +107,7 @@ def index (request):
                 print("\n")
         
 
-        except:
+        else:
 
                 status_system = "Stopped"
 
@@ -103,7 +137,7 @@ def index (request):
                             "então","viu","vemos","pode","podemos","vez",
                             "vcs","hein","quer","sim","deu","já","demos",
                             "todas","aqui","sei","sabemos","fazer","fiz",
-                            "fez","fazemos","vem","vamos","ainda","tanto","nesse","pocah"]
+                            "fez","fazemos","vem","vamos","ainda","tanto","nesse","pocah"] + [query]
 
         data_tweets_final["text"] = data_tweets_final["text"].apply(lambda x: text_cleaner(text=x,stop_words_domain=stop_words_domain)) 
 
@@ -252,17 +286,23 @@ def index (request):
             "number_of_docs": df_report_sum_docs["SUM"].tolist(),
             "p_number_of_docs": df_report_sum_docs["P_DOCS"].tolist(),
             "words_number_of_docs": df_report_sum_docs["WORDS"].tolist(),
-            "median_count":median_count,
-            "median_count_diferents_tokens":median_count_diferents_tokens,
             "mean_count":mean_count,
             "mean_count_diferents_tokens":mean_count_diferents_tokens,
             "std_count":std_count,
             "std_count_diferents_tokens":std_count_diferents_tokens,
             "var_count":var_count,
             "var_count_diferents_tokens":var_count_diferents_tokens,
-            "status_system":status_system
+            "status_system":status_system,
+            "n_tweets":len(data_tweets_final),
+            "query":query,
+            "oldest_date_tweet":oldest_date_tweet,
+            "newest_date_tweet":newest_date_tweet
+
         }
 
+        oldest_date_tweet =  data_tweets_final["created_at"].min()
+
+        newest_date_tweet =  data_tweets_final["created_at"].max()
 
         text = " ".join(review for review in data_tweets_final.text)
 
@@ -271,7 +311,7 @@ def index (request):
         wordcloud.to_file(IMAGE_PATH)
 
     
-    except:
+    else:
 
 
         data = {
@@ -290,17 +330,26 @@ def index (request):
             "number_of_docs": [0,0,0,0,0,0,0,0,0,0],
             "p_number_of_docs": [0,0,0,0,0,0,0,0,0,0],
             "words_number_of_docs": ["palavra1","palavra2","palavra3","palavra4","palavra5","palavra6","palavra7","palavra8","palavra9","palavra10"],
-            "median_count":0,
-            "median_count_diferents_tokens":0,
             "mean_count":0,
             "mean_count_diferents_tokens":0,
             "std_count":0,
             "std_count_diferents_tokens":0,
             "var_count":0,
             "var_count_diferents_tokens":0,
-            "status_system":"Stopped"
+            "status_system":"Not starting",
+            "n_tweets":0,
+            "query":"",
+            "oldest_date_tweet":"NO DATA",
+            "newest_date_tweet":"NO DATA"
+
         }
 
+
+        text = "NO_DATA"
+
+        wordcloud = WordCloud(max_font_size=1300, max_words=1, background_color="black",width=3000, height=1300,).generate(text)
+
+        wordcloud.to_file(IMAGE_PATH)
 
     
     return render(request,"index.html",data)
@@ -322,35 +371,61 @@ def persist_results (request):
     print("\n")
     print("\n")
 
-    #data["contentTwitter"]
+
     
-    data_tweets_final = extract_many_tweets(qnt_cycle=1,folder=PERSIST_DATA_TWEET_PATH,query="bbb",bearer_token = BEARER_TOKEN)
+    if os.path.isfile(PERSIST_DATA_TWEET_PATH_RUNNING + os.sep + "data_tweets.json"):
 
-    print("\n")
-    print("\n")
 
-    print(data_tweets_final)
+        # LOAD data_tweets
 
-    print("\n")
-    print("\n")
+        
+        file_name_data_tweets = open(PERSIST_DATA_TWEET_PATH_RUNNING + os.sep + "data_tweets.json", 'r')
+        
+        data_json_tweets = json.load(file_name_data_tweets)
+
+        print("\n")
+        print("\n")
+        print("DATA TWEETS: \n")
+        print(data_json_tweets)
+        print("\n")
+        print("\n")    
+
+        newest_id = data_json_tweets["meta"]["newest_id"]
+        
+        new_tweets = extract_many_tweets(qnt_cycle=1,folder=PERSIST_DATA_TWEET_PATH,query=data_json_tweets["meta"]["query"],bearer_token = BEARER_TOKEN,since_id=newest_id)
+
+        
+        data_json_tweets["meta"]["newest_id"] = new_tweets["meta"]["newest_id"]
+
+        full_data_tweets = data_json_tweets["data"] +  new_tweets["data"]
+
+        data_json_tweets["data"] = full_data_tweets
+
+
+        
+        data_tweets_final = data_json_tweets
+
+    else:
+
+
+
+        data_tweets_final = extract_many_tweets(qnt_cycle=1,folder=PERSIST_DATA_TWEET_PATH,query=data["query"],bearer_token = BEARER_TOKEN)
+
+
 
     f_data = open(PERSIST_DATA_TWEET_PATH + os.sep +"running" + os.sep + "data_tweets.json", 'w+', encoding='utf8')
-
 
 
     json.dump(data_tweets_final, f_data, ensure_ascii=False)
 
 
 
-
-    status_system = {'status':data["status_sytem"]}
+    status_system = {'status':data["status_sytem"],"query":data["query"]}
 
     f_status_system = open("{}/running/status_system.json".format(PERSIST_DATA_TWEET_PATH), 'w')
     
     
     json.dump(status_system, f_status_system)
-
-
 
     
     # LOAD STATUS SYSTEM

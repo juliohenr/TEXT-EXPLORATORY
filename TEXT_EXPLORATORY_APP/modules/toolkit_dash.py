@@ -10,6 +10,8 @@ from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import nltk
 from nltk.corpus import stopwords
 from unicodedata import normalize as norm
+import datetime
+from datetime import timedelta
 nltk.download('stopwords')
 
 
@@ -55,6 +57,15 @@ def plot_bar_count_words(text_column=None,
 
 ### Função para plotar bar plot com tf-idf
 
+
+def modify_date(x):
+    
+
+    date_time_str = x.replace("T"," ").replace("Z","")
+    date_time_obj = datetime.datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S.%f')
+
+    return date_time_obj - timedelta(hours=3)
+    
 
 def plot_bar_tf_idf(text_column=None,
                          label_column=None,

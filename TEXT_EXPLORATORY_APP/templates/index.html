@@ -27,14 +27,14 @@
     <div class="div-text-content">
 
         <h3>Content:</h3>
-        <textarea class="textArea contentTwitter" placeholder="Content from twitter"></textarea>
+        <textarea class="textArea contentTwitter" placeholder="Content from twitter">{{query}}</textarea>
 
     </div>
 
     <div class="div-text-stop-words">
 
         <h3>Stop Words:</h3>
-        <textarea class="textArea"  placeholder="Stop words of domain"></textarea>
+        <textarea class="textArea StopWords"  placeholder="Stop words of domain" ></textarea>
 
     </div>
     <!--<button class="buttonSend"><strong>SEND</strong></button>-->
@@ -61,12 +61,14 @@
                 <ul>
                     <li>AVG Quantity of tokens = {{mean_count}}</li>
                     <li>VAR Quantity of tokens = {{var_count}}</li>
-                    <li> MEDIAN Quantity of tokens = {{median_count}}</li>
                     <li>STD Quantity of tokens = {{std_count}}</li>
                     <li>AVG Quantity of differents tokens = {{mean_count_diferents_tokens}}</li>
                     <li>VAR Quantity of differents tokens = {{var_count_diferents_tokens}}</li>
-                    <li> MEDIAN Quantity of differents tokens = {{median_count_diferents_tokens}}</li>
                     <li>STD Quantity of differents differents tokens = {{std_count_diferents_tokens}}</li>
+                    <li>ºN Tweets = {{n_tweets}}</li>
+                    <li>Newest date tweet = {{newest_date_tweet}}</li>
+                    <li>Oldest date tweet = {{oldest_date_tweet}}</li>
+
 
                 </ul>
                 

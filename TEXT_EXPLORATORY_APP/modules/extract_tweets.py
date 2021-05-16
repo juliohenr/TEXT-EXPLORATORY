@@ -22,20 +22,20 @@ def create_url(query = None,until_id=None,since_id=None):
     
     if until_id:
         
-        url = "https://api.twitter.com/2/tweets/search/recent?query={}&max_results=10&tweet.fields=author_id,created_at&until_id={}&".format(
+        url = "https://api.twitter.com/2/tweets/search/recent?query={}&max_results=100&tweet.fields=author_id,created_at&until_id={}&".format(
             query,until_id
         )
 
     elif since_id:
 
-        url = "https://api.twitter.com/2/tweets/search/recent?query={}&max_results=10&tweet.fields=author_id,created_at&since_id={}&".format(
+        url = "https://api.twitter.com/2/tweets/search/recent?query={}&max_results=100&tweet.fields=author_id,created_at&since_id={}&".format(
             query,since_id
         )
 
         
     else:
         
-        url = "https://api.twitter.com/2/tweets/search/recent?query={}&max_results=10&tweet.fields=author_id,created_at".format(
+        url = "https://api.twitter.com/2/tweets/search/recent?query={}&max_results=100&tweet.fields=author_id,created_at".format(
             query
         )
             
@@ -225,6 +225,13 @@ def extract_many_tweets(qnt_cycle=10,
     #json.dump(status_system, f_status_system)
 
 
+    print("\n")
+    print("\n")
+    print("data at function")
+    data["meta"]["query"]
+    print("\n")
+    print("\n")
+    
     return data
     
     

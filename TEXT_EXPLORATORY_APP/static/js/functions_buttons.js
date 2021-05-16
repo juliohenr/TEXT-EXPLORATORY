@@ -15,6 +15,34 @@ if(document.querySelector(".status-system").innerText == "Running") {
   }
 
 
+if(document.querySelector(".status-system").innerText != "Not starting") {
+
+    //document.querySelector(".status-system").style.color = "#008000"
+
+    //document.getElementById("myBtn").disabled = true
+
+    document.querySelector(".contentTwitter").disabled = true;
+
+    document.querySelector(".contentTwitter").style.backgroundColor='gray';
+
+    document.querySelector(".contentTwitter").style.color='white';
+
+
+
+
+    document.querySelector(".StopWords").disabled = true;
+
+    document.querySelector(".StopWords").style.backgroundColor='gray';
+
+    document.querySelector(".StopWords").style.color='white';
+
+
+
+
+  
+    }
+
+
 
 buttonStop.addEventListener("click", function() {
 
@@ -34,7 +62,7 @@ buttonStop.addEventListener("click", function() {
 
   data.append("status_sytem", "Stopped");
   
-  
+  data.append("query", contentTwitter);
   
   console.log("clicou aqui!")
     
@@ -60,9 +88,29 @@ buttonStop.addEventListener("click", function() {
 
 buttonRun.addEventListener("click", function() {
 
-    document.querySelector(".status-system").innerText = "Running"
+    document.querySelector(".status-system").innerText = "Running";
 
-    document.querySelector(".status-system").style.color = "#008000"
+    document.querySelector(".status-system").style.color = "#008000";
+
+
+
+    document.querySelector(".contentTwitter").disabled = true;
+
+    document.querySelector(".contentTwitter").style.backgroundColor='gray';
+
+    document.querySelector(".contentTwitter").style.color='white';
+
+
+
+
+    document.querySelector(".StopWords").disabled = true;
+
+    document.querySelector(".StopWords").style.backgroundColor='gray';
+
+    document.querySelector(".StopWords").style.color='white';
+
+
+
 
     console.log("carregou!")
     
@@ -76,6 +124,8 @@ buttonRun.addEventListener("click", function() {
     //data.append("contentTwitter", contentTwitter);
 
     data.append("status_sytem", "Running");
+
+    data.append("query", contentTwitter);
     
     
     
@@ -123,7 +173,7 @@ interval = setInterval(function () {
     
     let data = new FormData();
     
-    data.append("contentTwitter", contentTwitter);
+    data.append("query", contentTwitter);
 
     data.append("status_sytem", "Running");
     
@@ -136,7 +186,7 @@ interval = setInterval(function () {
     const url='http://127.0.0.1:8000/persist_results';
     
     
-    data.append("contentTwitter", contentTwitter);
+    data.append("query", contentTwitter);
     
     
     
